@@ -119,3 +119,10 @@ void set_reg(uint8_t _reg_num, uint16_t _reg_val) {
     if (check_idx(_reg_num, REGISTER_COUNT))
         V[_reg_num] = _reg_num;
 }
+
+uint16_t get_reg(uint8_t _reg_num) {
+    if (check_idx(_reg_num, REGISTER_COUNT)) {
+        return V[_reg_num];
+    }
+    return -1;
+}

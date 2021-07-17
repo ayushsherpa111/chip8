@@ -40,3 +40,7 @@ bool reg_cmp_reg(uint8_t __idx_lhs,
 
 // set_reg sets the value of the register _reg_num
 void set_reg(uint8_t _reg_num, uint16_t _reg_val);
+
+// get_reg gets the value in a given register
+uint16_t get_reg(uint8_t _reg_num);
+

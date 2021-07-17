@@ -1,8 +1,11 @@
 #include "chip8.h"
+#include <bits/stdint-uintn.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "../memory/memory.h"
+
+#define V_FLAG 0xF
 
 // Initializes the Environment required for the chip
 // sets the required registers
@@ -23,10 +26,6 @@ bool _equ(uint16_t lhs, uint16_t rhs) {
     return lhs == rhs;
 }
 
-/* bool _gt_() { */
-
-/* } */
-
 // Load ROM into working memory
 int load(const char* gameLocation) {
     FILE* ROM = fopen(gameLocation, "rb");
@@ -41,6 +40,9 @@ int load(const char* gameLocation) {
 
 void decode_exec(uint16_t opcode, chip8* chip) {
     uint16_t* _st_pop;
+    uint16_t result;
+    uint16_t _op_X;
+    uint16_t _op_Y;
     switch (opcode & 0xF000) {
         case 0x0000:
             switch (opcode & 0x000F) {
@@ -81,6 +83,58 @@ void decode_exec(uint16_t opcode, chip8* chip) {
             break;
         case 0x6000:
             set_reg((opcode & 0x0F00) >> 2, opcode & 0x00FF);
+            break;
+        case 0x7000:
+            set_reg((opcode & 0x0F00) >> 2,
+                    get_reg((opcode & 0x0F00) >> 2) + (opcode & 0x00FF));
+            break;
+        case 0x8000:
+            _op_X = get_reg((opcode & 0x0F00) >> 2);
+            _op_Y = get_reg((opcode & 0x00F0) >> 1);
+            switch (opcode & 0x000F) {
+                case 0x0000:
+                    // set Vx = Vy
+                    result = _op_X;
+                    break;
+                case 0x0001:
+                    result = _op_X | _op_Y;
+                    break;
+                case 0x0002:
+                    result = _op_X & _op_Y;
+                    break;
+                case 0x0003:
+                    result = _op_X ^ _op_Y;
+                    break;
+                case 0x0004:
+                    result = _op_X + _op_Y;
+                    if (result < _op_X) {
+                        set_reg(V_FLAG, 0x1);
+                    }
+                    break;
+                case 0x0005:
+                    result = _op_X - _op_Y;
+                    if (result > _op_X) {
+                        set_reg(V_FLAG, 0x1);
+                    }
+                    break;
+                case 0x0006:
+                    set_reg(V_FLAG, _op_X & 0x0001);
+                    result = _op_X >> 1;
+                    break;
+                case 0x0007:
+                    result = _op_Y - _op_X;
+                    if (result > _op_X) {
+                        set_reg(V_FLAG, 0x1);
+                    }
+                    break;
+                case 0x000E:
+                    set_reg(V_FLAG, 0x1000);
+                    result = _op_X << 1;
+                    break;
+            }
+            set_reg((opcode & 0x0F00) >> 2, result);
+            break;
+        case 0x9000:
             break;
         default:
             printf("Unkown opcode\n");
