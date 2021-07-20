@@ -14,6 +14,26 @@
 
 void load_fontset(uint16_t*);
 
+// The fontset used by all ROMS for chip8
+unsigned char chip8_fontset[80] = {
+    0xF0, 0x90, 0x90, 0x90, 0xF0,  // 0
+    0x20, 0x60, 0x20, 0x20, 0x70,  // 1
+    0xF0, 0x10, 0xF0, 0x80, 0xF0,  // 2
+    0xF0, 0x10, 0xF0, 0x10, 0xF0,  // 3
+    0x90, 0x90, 0xF0, 0x10, 0x10,  // 4
+    0xF0, 0x80, 0xF0, 0x10, 0xF0,  // 5
+    0xF0, 0x80, 0xF0, 0x90, 0xF0,  // 6
+    0xF0, 0x10, 0x20, 0x40, 0x40,  // 7
+    0xF0, 0x90, 0xF0, 0x90, 0xF0,  // 8
+    0xF0, 0x90, 0xF0, 0x10, 0xF0,  // 9
+    0xF0, 0x90, 0xF0, 0x90, 0x90,  // A
+    0xE0, 0x90, 0xE0, 0x90, 0xE0,  // B
+    0xF0, 0x80, 0x80, 0x80, 0xF0,  // C
+    0xE0, 0x90, 0x90, 0x90, 0xE0,  // D
+    0xF0, 0x80, 0xF0, 0x80, 0xF0,  // E
+    0xF0, 0x80, 0xF0, 0x80, 0x80   // F
+};
+
 // 4Kb Working memory
 // 0-511 (0x000 - 0x1FF) Interpreter
 // 80-160 (0x50 - 0x0A0) used for pixel font set
@@ -36,7 +56,7 @@ uint16_t get_opcode(uint16_t pc) {
 // Initalize the game state and all the memory involved.
 void init_mem() {
     memory = (uint16_t*)calloc(MEM_SIZE, sizeof(uint16_t));
-    /* load_fontset(memory); */
+    load_fontset(memory);
 
     key = (uint8_t*)calloc(HEX_KEY_BOARD, sizeof(uint8_t));
     V = (uint8_t*)calloc(REGISTER_COUNT, sizeof(uint8_t));
@@ -73,8 +93,14 @@ uint16_t* pop_stk(uint16_t _sp) {
 }
 
 void load_fontset(uint16_t* mem) {
-    for (int i = 80; i < 160; i++) {
-        // mem[i] = get_fontset(i);
+    for (uint16_t mem_addr = 0x50; mem_addr <= 0xA0; mem_addr++) {
+        for (int fnt_idx = 0; fnt_idx < 80; fnt_idx++) {
+            for (int fnt_dim = 0; fnt_dim < 4; fnt_dim++) {
+                // FONTSET DIM 5x4
+                memory[mem_addr + fnt_idx + fnt_dim] =
+                    chip8_fontset[fnt_idx + fnt_dim];
+            }
+        }
     }
 }
 

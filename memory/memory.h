@@ -18,6 +18,9 @@ void disp_mem();
 
 uint16_t push_stk(uint16_t _sp, uint16_t _stk_val);
 
+uint16_t delay;
+uint16_t sound_timer;
+
 // pop_stk
 // Pops data off the stack
 uint16_t* pop_stk(uint16_t _sp);
