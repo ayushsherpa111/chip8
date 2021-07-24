@@ -38,6 +38,7 @@ unsigned char chip8_fontset[80] = {
 // 0-511 (0x000 - 0x1FF) Interpreter
 // 80-160 (0x50 - 0x0A0) used for pixel font set
 // 512-4095 (0x200 - 0xFFF) Program ROM and work RAM
+// FIXME memory is uint16_t but font is uint8_t
 uint16_t* memory;
 
 // 16 8-bit registers
@@ -141,14 +142,21 @@ bool reg_cmp_reg(uint8_t __idx_lhs,
                : false;
 }
 
-void set_reg(uint8_t _reg_num, uint16_t _reg_val) {
+void set_reg(uint8_t _reg_num, uint8_t _reg_val) {
     if (check_idx(_reg_num, REGISTER_COUNT))
         V[_reg_num] = _reg_num;
 }
 
-uint16_t get_reg(uint8_t _reg_num) {
+uint8_t get_reg_value(uint8_t _reg_num) {
     if (check_idx(_reg_num, REGISTER_COUNT)) {
         return V[_reg_num];
     }
     return -1;
+}
+
+uint16_t read_mem(uint16_t ptr) {
+    if (!(ptr < 0 || ptr > MEM_SIZE)) {
+        return memory[ptr];
+    }
+    return 0;
 }

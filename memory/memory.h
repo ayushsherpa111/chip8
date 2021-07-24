@@ -42,8 +42,10 @@ bool reg_cmp_reg(uint8_t __idx_lhs,
                  bool (*_cmp_func)(uint16_t, uint16_t));
 
 // set_reg sets the value of the register _reg_num
-void set_reg(uint8_t _reg_num, uint16_t _reg_val);
+void set_reg(uint8_t _reg_num, uint8_t _reg_val);
 
 // get_reg gets the value in a given register
-uint16_t get_reg(uint8_t _reg_num);
+uint8_t get_reg_value(uint8_t _reg_num);
 
+// read_mem returns the value at a memory address
+uint16_t read_mem(uint16_t _ptr);
