@@ -40,7 +40,7 @@ chip8* initialize() {
     chip->drawflag = false;
     chip->wrapX = false;
     chip->wrapY = false;
-    init_scr(chip->screen);
+    init_scr(chip->gfx);
 
     init_mem();
 
@@ -191,6 +191,7 @@ void decode_exec(uint16_t opcode, chip8* chip) {
             break;
         case 0xD000:
             // Draw
+            chip->PC++;
             height = opcode & 0x000F;
             _x_coord =
                 get_reg_value((opcode & 0x0F00) >> 8);  // X position on screen
@@ -201,12 +202,12 @@ void decode_exec(uint16_t opcode, chip8* chip) {
             for (int i = 0; i < height; i++) {
                 uint8_t sprite = (uint8_t)read_mem(chip->I + i);
                 uint8_t _s_sprt = (sprite >> (_x_coord % 8));
-                if ((chip->screen[_y_coord][_x_coord] & _s_sprt) > 0) {
+                if ((chip->gfx[_y_coord][_x_coord] & _s_sprt) > 0) {
                     set_reg(V_FLAG, 0x1);
                 } else {
                     set_reg(V_FLAG, 0x0);
                 }
-                chip->screen[_y_coord][_x_coord / 8] ^= _s_sprt;
+                chip->gfx[_y_coord][_x_coord / 8] ^= _s_sprt;
                 // TODO implement wrap logic
                 if (chip->wrapX)
                     if (_x_coord % 8 != 0) {
@@ -223,6 +224,12 @@ void decode_exec(uint16_t opcode, chip8* chip) {
             }
             break;
         case 0xE000:
+            switch (opcode & 0x00FF) {
+                case 0x009E:
+                    break;
+                case 0x00A1:
+                    break;
+            }
             break;
         case 0xF000:
             break;
