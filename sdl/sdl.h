@@ -3,12 +3,9 @@
 #include <SDL2/SDL_video.h>
 #include <stdint.h>
 
-// create_window
-SDL_Window*
-create_window(const char* title, uint32_t flags);
-
-SDL_Renderer*
-create_renderer(SDL_Window*);
-
 SDL_Texture*
-create_texture();
+create_texture(SDL_Renderer* _renderer);
+
+void
+create_window_and_renderer(SDL_Window* _win, SDL_Renderer* _rend);
+

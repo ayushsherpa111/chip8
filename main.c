@@ -4,7 +4,9 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_error.h>
+#include <SDL2/SDL_events.h>
 #include <SDL2/SDL_render.h>
+#include <SDL2/SDL_timer.h>
 #include <SDL2/SDL_video.h>
 #include <math.h>
 #include <stdint.h>
@@ -23,12 +25,14 @@ int
 main()
 {
     bool is_runnning = true;
-    SDL_Window* _emu_win = create_window(
-      "CHIP8 EMU", SDL_INIT_VIDEO | SDL_INIT_AUDIO); // INIT WINDOW
+    int delay = 16;
 
-    SDL_Renderer* _emu_renderer = create_renderer(_emu_win);
+    SDL_Window* _emu_win;
+    SDL_Renderer* _emu_renderer;
+    create_window_and_renderer(_emu_win, _emu_renderer);
 
-    SDL_Texture* _emu_texture = create_texture();
+    SDL_Texture* _emu_texture = create_texture(_emu_renderer);
+    SDL_SetWindowTitle(_emu_win, "CHIP8");
 
     if (!_emu_win) {
         fprintf(stderr, "ERROR: %s", SDL_GetError());
@@ -36,10 +40,21 @@ main()
         chip8* chip = initialize();
         load("./ROMS/Airplane.ch8"); // Load the game to play in memory
                                      /* disp_mem(); */
+        SDL_Event* usr_eve;
         while (is_runnning) {
-            emulateCycle(chip);
+            // keep executing instructions until the draw flag is set and the
+            // screen needs to be updated
+            while (!chip->draw)
+                emulateCycle(chip, usr_eve);
+
+            input(chip, &is_runnning);
             // TODO store frame buffer on the chip, abstract the drawing of each
             // frame using renderer and textures
+
+            if (chip->draw) {
+            }
+
+            SDL_Delay(delay);
         }
     }
 
