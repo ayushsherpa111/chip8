@@ -3,9 +3,10 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/wait.h>
 
-#define MEM_SIZE 2 << 10
+#define MEM_SIZE 4 << 10
 #define HEX_KEY_BOARD 16
 #define REGISTER_COUNT 16
 #define STACK_SIZE 16
@@ -13,34 +14,33 @@
 #define OFFSET 0x200
 
 void
-load_fontset(uint16_t*);
+load_fontset(uint8_t*);
 
 // The fontset used by all ROMS for chip8
 uint8_t chip8_fontset[80] = {
-    0xF999F, // 0
-    0x26227, // 1
-    /* 0xF010F080F0, // 2 */
-    /* 0xF010F010F0, // 3 */
-    /* 0x9090F01010, // 4 */
-    /* 0xF080F010F0, // 5 */
-    /* 0xF080F090F0, // 6 */
-    /* 0xF010204040, // 7 */
-    /* 0xF090F090F0, // 8 */
-    /* 0xF090F010F0, // 9 */
-    /* 0xF090F09090, // A */
-    /* 0xE090E090E0, // B */
-    /* 0xF0808080F0, // C */
-    /* 0xE0909090E0, // D */
-    /* 0xF080F080F0, // E */
-    /* 0xF080F08080  // F */
+    0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
+    0x20, 0x60, 0x20, 0x20, 0x70, // 1
+    0xF0, 0x10, 0xF0, 0x80, 0xF0, // 2
+    0xF0, 0x10, 0xF0, 0x10, 0xF0, // 3
+    0x90, 0x90, 0xF0, 0x10, 0x10, // 4
+    0xF0, 0x80, 0xF0, 0x10, 0xF0, // 5
+    0xF0, 0x80, 0xF0, 0x90, 0xF0, // 6
+    0xF0, 0x10, 0x20, 0x40, 0x40, // 7
+    0xF0, 0x90, 0xF0, 0x90, 0xF0, // 8
+    0xF0, 0x90, 0xF0, 0x10, 0xF0, // 9
+    0xF0, 0x90, 0xF0, 0x90, 0x90, // A
+    0xE0, 0x90, 0xE0, 0x90, 0xE0, // B
+    0xF0, 0x80, 0x80, 0x80, 0xF0, // C
+    0xE0, 0x90, 0x90, 0x90, 0xE0, // D
+    0xF0, 0x80, 0xF0, 0x80, 0xF0, // E
+    0xF0, 0x80, 0xF0, 0x80, 0x80  // F
 };
 
 // 4Kb Working memory
 // 0-511 (0x000 - 0x1FF) Interpreter
 // 80-160 (0x50 - 0x0A0) used for pixel font set
 // 512-4095 (0x200 - 0xFFF) Program ROM and work RAM
-// FIXME memory is uint16_t but font is uint8_t
-uint16_t* memory;
+uint8_t* memory;
 
 // 16 8-bit registers
 uint8_t* V;
@@ -54,14 +54,14 @@ uint8_t* key;
 uint16_t
 get_opcode(uint16_t pc)
 {
-    return memory[pc];
+    return memory[pc] << 8 | memory[pc + 1];
 }
 
 // Initalize the game state and all the memory involved.
 void
 init_mem()
 {
-    memory = (uint16_t*)calloc(MEM_SIZE, sizeof(uint16_t));
+    memory = (uint8_t*)calloc(MEM_SIZE, sizeof(uint8_t)); // 4 MB
     load_fontset(memory);
 
     key = (uint8_t*)calloc(HEX_KEY_BOARD, sizeof(uint8_t));
@@ -105,17 +105,9 @@ pop_stk(uint16_t _sp)
 }
 
 void
-load_fontset(uint16_t* mem)
+load_fontset(uint8_t* mem)
 {
-    for (uint16_t mem_addr = 0x50; mem_addr <= 0xA0; mem_addr++) {
-        for (int fnt_idx = 0; fnt_idx < 80; fnt_idx++) {
-            for (int fnt_dim = 0; fnt_dim < 4; fnt_dim++) {
-                // FONTSET DIM 5x4
-                memory[mem_addr + fnt_idx + fnt_dim] =
-                  chip8_fontset[fnt_idx + fnt_dim];
-            }
-        }
-    }
+    memcpy(memory + 0x50, mem, 16 * 5);
 }
 
 void
