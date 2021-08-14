@@ -29,3 +29,8 @@ wrap_coords(uint8_t* _x_coord, uint8_t* _y_coord)
         *_y_coord += Y_SCREEN;
 }
 
+bool
+is_key_pressed(uint16_t _key_map, uint8_t _val)
+{
+    return (_key_map >> _val) & 0x1;
+}

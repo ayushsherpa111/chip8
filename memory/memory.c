@@ -127,7 +127,6 @@ load_rom(FILE* rom_file)
     fread(memory + OFFSET, sizeof(memory), num_bytes, rom_file);
 }
 
-// PERF
 void
 disp_mem()
 {
@@ -165,7 +164,7 @@ set_reg(uint8_t _reg_num, uint8_t _reg_val)
 }
 
 uint8_t
-get_reg_value(uint8_t _reg_num)
+_V(uint8_t _reg_num)
 {
     if (check_idx(_reg_num, REGISTER_COUNT)) {
         return V[_reg_num];
@@ -173,11 +172,19 @@ get_reg_value(uint8_t _reg_num)
     return -1;
 }
 
-uint16_t
+uint8_t
 read_mem(uint16_t ptr)
 {
     if (!(ptr < 0 || ptr > MEM_SIZE)) {
         return memory[ptr];
     }
     return 0;
+}
+
+void
+set_mem(int _addr, uint8_t _val)
+{
+    if (_addr < MEM_SIZE) {
+        memory[_addr] = _val;
+    }
 }

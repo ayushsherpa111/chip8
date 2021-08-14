@@ -1,4 +1,5 @@
 #pragma once
+#include "stdbool.h"
 #include <stdint.h>
 
 // set_frame sets the value at a particular x and y coordinate
@@ -13,3 +14,7 @@ get_px(uint32_t* frame, uint8_t _x_coord, uint8_t _y_coord);
 
 void
 wrap_coords(uint8_t* _x_coord, uint8_t* _y_coord);
+
+// check if key pressed is same as the value in the register
+bool
+is_key_pressed(uint16_t _key_map, uint8_t _val);

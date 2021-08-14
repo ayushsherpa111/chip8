@@ -8,6 +8,12 @@
 #define X_SCREEN 64
 #define Y_SCREEN 32
 
+#define FONT_HEIGHT 5
+#define FONT_WIDTH 4
+
+#define ACTIVE_PX 0xffffffff
+#define INACTIVE_PX 0x00000000
+
 // key map
 #define KEY_0 0b0000000000000001
 #define KEY_1 0b0000000000000010
