@@ -22,36 +22,47 @@ void
 get_size(unsigned char);
 
 int
-main()
+main(int argc, char* argv[])
 {
     bool is_runnning = true;
     int delay = 16;
 
     SDL_Window* _emu_win;
     SDL_Renderer* _emu_renderer;
-    create_window_and_renderer(_emu_win, _emu_renderer);
+
+    create_window_and_renderer(&_emu_win, &_emu_renderer);
+
+    if (!_emu_win || !_emu_renderer) {
+        printf("Failed to init window|renderer %s", SDL_GetError());
+        return 1;
+    }
 
     SDL_Texture* _emu_texture = create_texture(_emu_renderer);
-    SDL_SetWindowTitle(_emu_win, "CHIP8");
+    if (!_emu_texture) {
+        printf("Failed to create texture %s", SDL_GetError());
+        return 2;
+    }
 
     if (!_emu_win) {
         fprintf(stderr, "ERROR: %s", SDL_GetError());
     } else {
         chip8* chip = initialize();
-        load("./ROMS/Airplane.ch8"); // Load the game to play in memory
-                                     /* disp_mem(); */
-        SDL_Event* usr_eve;
+        load("./ROMS/test_opcode.ch8"); // Load the game to play in memory
+        return 0;
+        /* SDL_Event* usr_eve; */
         while (is_runnning) {
             // keep executing instructions until the draw flag is set and the
             // screen needs to be updated
             while (!chip->draw)
-                emulateCycle(chip, usr_eve);
+                emulateCycle(chip);
 
             input(chip, &is_runnning);
             // TODO store frame buffer on the chip, abstract the drawing of each
             // frame using renderer and textures
 
             if (chip->draw) {
+                draw_frame(chip->gfx, _emu_renderer, _emu_texture);
+                chip->draw = false;
             }
 
             SDL_Delay(delay);
@@ -59,7 +70,11 @@ main()
     }
 
     SDL_DestroyWindow(_emu_win);
+    SDL_DestroyRenderer(_emu_renderer);
+    SDL_DestroyTexture(_emu_texture);
+
     SDL_Quit();
+    return 0;
 }
 
 void

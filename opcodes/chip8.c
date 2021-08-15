@@ -8,17 +8,19 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 
-// clr_scr clears the screen by setting each pixel value to 0
 void
-clr_scr(uint8_t** _scr)
+clear_disp(uint32_t* gfx)
 {
-    for (int row = 0; row < Y_SCREEN; row++) {
-        for (int col = 0; col < 8; col++) {
-            _scr[row][col] = 0; // *(*(_scr + row) + col) = 0;
-        }
-    }
+    memset(gfx, INACTIVE_PX, X_SCREEN * Y_SCREEN);
+}
+
+void
+print_vm_state(chip8* vm)
+{
+    /* printf("PC -- %d",); */
 }
 
 // clr_scr clears the screen by setting each pixel value to 0
@@ -42,7 +44,7 @@ initialize()
     chip->I = 0;
     chip->PC = 0x200;
     chip->SP = 0x0;
-    chip->drawflag = false;
+    chip->draw = false;
     chip->wrapX = false;
     chip->wrapY = false;
     chip->keypad = 0;
@@ -50,8 +52,19 @@ initialize()
 
     init_mem();
 
-    clear_disp();
+    clear_disp(chip->gfx);
     return chip;
+}
+
+void
+reset(chip8* vm)
+{
+    clear_disp(vm->gfx);
+    reset_stack();
+    reset_reg();
+    vm->draw = false;
+    vm->I = vm->keypad = vm->SP = vm->delay = vm->sound = 0;
+    vm->PC = 0x200;
 }
 
 // Returns the equality comparison result of 2 values
@@ -97,7 +110,7 @@ decode_exec(uint16_t opcode, chip8* chip)
                 case 0x0000:
                     break;
                 case 0x00E0:
-                    // TODO Clear display
+                    clear_disp(chip->gfx);
                     break;
                 case 0x000E: // return from subroutine
                     // Check if there is anything on the stack
@@ -287,10 +300,11 @@ decode_exec(uint16_t opcode, chip8* chip)
 }
 
 void
-emulateCycle(chip8* chip, SDL_Event* _eve)
+emulateCycle(chip8* chip)
 {
     // fetch opcode
     uint16_t opcode = get_opcode(chip->PC);
+    printf("Processing %x", opcode);
 
     // decode opcode
     decode_exec(opcode, chip);
@@ -363,6 +377,8 @@ input(chip8* vm, bool* is_running)
                         vm->keypad |= KEY_F;
                         break;
                     // TODO add a clear screen/reset button
+                    case SDLK_o:
+                        break;
                     default:
                         break;
                 }

@@ -7,7 +7,6 @@
 #include <sys/wait.h>
 
 #define MEM_SIZE 4 << 10
-#define HEX_KEY_BOARD 16
 #define REGISTER_COUNT 16
 #define STACK_SIZE 16
 
@@ -48,9 +47,6 @@ uint8_t* V;
 // Stack
 uint16_t* stack;
 
-// Hex key mappings
-uint8_t* key;
-
 uint16_t
 get_opcode(uint16_t pc)
 {
@@ -62,9 +58,8 @@ void
 init_mem()
 {
     memory = (uint8_t*)calloc(MEM_SIZE, sizeof(uint8_t)); // 4 MB
-    load_fontset(memory);
+    load_fontset(chip8_fontset);
 
-    key = (uint8_t*)calloc(HEX_KEY_BOARD, sizeof(uint8_t));
     V = (uint8_t*)calloc(REGISTER_COUNT, sizeof(uint8_t));
     stack = (uint16_t*)calloc(STACK_SIZE, sizeof(uint16_t));
 }
@@ -105,14 +100,10 @@ pop_stk(uint16_t _sp)
 }
 
 void
-load_fontset(uint8_t* mem)
+load_fontset(uint8_t* font_set)
 {
-    memcpy(memory + 0x50, mem, 16 * 5);
+    memcpy(memory + 0x50, font_set, 16 * 5);
 }
-
-void
-clear_disp()
-{}
 
 void
 load_rom(FILE* rom_file)
@@ -130,8 +121,8 @@ load_rom(FILE* rom_file)
 void
 disp_mem()
 {
-    for (int i = 0x200; i < MEM_SIZE; i++) {
-        printf("% 2d ----- %x\n", i, memory[i]);
+    for (int i = 0x200; i < 4096; i += 2) {
+        printf("% 2d ----- %04x\n", i, memory[i] << 4 | memory[i + 1]);
     }
 }
 
@@ -187,4 +178,16 @@ set_mem(int _addr, uint8_t _val)
     if (_addr < MEM_SIZE) {
         memory[_addr] = _val;
     }
+}
+
+void
+reset_stack()
+{
+    memset(stack, 0, STACK_SIZE);
+}
+
+void
+reset_reg()
+{
+    memset(V, 0, REGISTER_COUNT);
 }

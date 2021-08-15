@@ -66,3 +66,9 @@ read_mem(uint16_t _ptr);
 // set_mem sets the value at a particular memory address.
 void
 set_mem(int _addr, uint8_t _val);
+
+void
+reset_stack();
+
+void
+reset_reg();

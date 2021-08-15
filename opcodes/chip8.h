@@ -39,7 +39,6 @@ struct chip8
     uint16_t I;            // Index Pointer
     uint16_t clock, timer; // timers for audio and delay
     uint32_t* gfx;         // [32*64]uint32_t
-    bool drawflag;         // draw on screen
     bool wrapX;            // wrap pixel on X axis
     bool wrapY;            // wrap pixel on Y axis
     bool draw; // draw flag to check wheather the screen must be updated or not
@@ -54,7 +53,7 @@ chip8*
 initialize();
 
 void
-emulateCycle(chip8*, SDL_Event*);
+emulateCycle(chip8*);
 
 int
 load(const char*);
