@@ -3,7 +3,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#define V_FLAG 0xF0
+#define V_FLAG 0x0F
 
 #define X_SCREEN 64
 #define Y_SCREEN 32

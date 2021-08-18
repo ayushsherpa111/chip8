@@ -72,3 +72,6 @@ reset_stack();
 
 void
 reset_reg();
+
+void
+cleanup();

@@ -9,7 +9,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
 
 void
 clear_disp(uint32_t* gfx)
@@ -99,8 +98,6 @@ decode_exec(uint16_t opcode, chip8* chip)
     uint8_t _x_coord;
     uint8_t _y_coord;
     uint8_t bcd;
-
-    srand(time(NULL));
 
     chip->PC += 2;
 
@@ -221,7 +218,7 @@ decode_exec(uint16_t opcode, chip8* chip)
             set_reg(V_FLAG, 0x0);
 
             // Draw
-            chip->PC++;
+            /* chip->PC++; */ // ???? WHYY
 
             height = opcode & 0x000F;
 
@@ -304,7 +301,6 @@ emulateCycle(chip8* chip)
 {
     // fetch opcode
     uint16_t opcode = get_opcode(chip->PC);
-    printf("Processing %x", opcode);
 
     // decode opcode
     decode_exec(opcode, chip);

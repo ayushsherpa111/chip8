@@ -151,7 +151,7 @@ void
 set_reg(uint8_t _reg_num, uint8_t _reg_val)
 {
     if (check_idx(_reg_num, REGISTER_COUNT))
-        V[_reg_num] = _reg_num;
+        V[_reg_num] = _reg_val;
 }
 
 uint8_t
@@ -190,4 +190,12 @@ void
 reset_reg()
 {
     memset(V, 0, REGISTER_COUNT);
+}
+
+void
+cleanup()
+{
+    free(memory);
+    free(V);
+    free(stack);
 }

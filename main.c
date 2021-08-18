@@ -12,6 +12,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 // VSYNC prevents screen tears i.e. Half of once screen half of another.
 
@@ -24,6 +25,8 @@ get_size(unsigned char);
 int
 main(int argc, char* argv[])
 {
+
+    srand(time(NULL));
     bool is_runnning = true;
     int delay = 16;
 
@@ -47,8 +50,12 @@ main(int argc, char* argv[])
         fprintf(stderr, "ERROR: %s", SDL_GetError());
     } else {
         chip8* chip = initialize();
-        load("./ROMS/test_opcode.ch8"); // Load the game to play in memory
-        return 0;
+
+        // Load the game to play in memory
+        if (load("./ROMS/test_opcode.ch8") > 0) {
+            printf("Failed to load ROM");
+            return 1;
+        }
         /* SDL_Event* usr_eve; */
         while (is_runnning) {
             // keep executing instructions until the draw flag is set and the
@@ -67,6 +74,7 @@ main(int argc, char* argv[])
 
             SDL_Delay(delay);
         }
+        free(chip);
     }
 
     SDL_DestroyWindow(_emu_win);
@@ -74,6 +82,8 @@ main(int argc, char* argv[])
     SDL_DestroyTexture(_emu_texture);
 
     SDL_Quit();
+
+    cleanup();
     return 0;
 }
 
