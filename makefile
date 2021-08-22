@@ -9,7 +9,6 @@ REL_DIR = $(O_DIR)/release
 all: release link
 	echo "OUTPUT: " ${REL_DIR}
 	echo "OUT files: " ${O_SRC}
-	rm -rf ${O_SRC}
 
 release:
 	mkdir -p ${REL_DIR}
@@ -20,4 +19,8 @@ link: ${O_SRC}
 
 %.o: %.c
 	echo "$< -> $@"
-	$(CC) ${CFLAGS} -g -c $< -o $@
+	$(CC) -g -c $< -o $@
+
+
+clean:
+	rm -rf ${O_SRC}
