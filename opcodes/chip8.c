@@ -446,6 +446,7 @@ void
 set_screen(chip8* vm, uint8_t _x_coord, uint8_t _y_coord, uint8_t height)
 {
     // draw for N number of rows
+    set_reg(V_FLAG, 0x0);
     for (int row = 0; row < height; row++) {
         uint8_t sprite = read_mem(vm->I + row);
         // pixel value of the current screen
@@ -458,15 +459,15 @@ set_screen(chip8* vm, uint8_t _x_coord, uint8_t _y_coord, uint8_t height)
                     // collision
                     set_reg(V_FLAG, 0x1);
                     set_frame(
-                      vm->gfx, _x_coord + col, _y_coord + row, ACTIVE_PX);
+                      vm->gfx, _x_coord + col, _y_coord + row, INACTIVE_PX);
                 } else {
                     /* set_reg(V_FLAG, 0x0); */
                     set_frame(
-                      vm->gfx, _x_coord + col, _y_coord + row, INACTIVE_PX);
+                      vm->gfx, _x_coord + col, _y_coord + row, ACTIVE_PX);
                 }
                 // set draw flag
-                vm->draw = true;
             }
         }
     }
+    vm->draw = true;
 }

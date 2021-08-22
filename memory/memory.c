@@ -12,6 +12,9 @@
 
 #define OFFSET 0x200
 
+uint16_t delay;
+uint16_t sound_timer;
+
 void
 load_fontset(uint8_t*);
 
