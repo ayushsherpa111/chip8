@@ -94,9 +94,9 @@ main(int argc, char* argv[])
 
                 SDL_LockTexture(_emu_texture, NULL, (void*)chip->gfx, &b);
                 SDL_UpdateTexture(_emu_texture, NULL, chip->gfx, 64 * 4);
-                SDL_UnlockTexture(_emu_texture);
                 SDL_RenderCopy(_emu_renderer, _emu_texture, NULL, NULL);
                 SDL_RenderPresent(_emu_renderer);
+                SDL_UnlockTexture(_emu_texture);
                 /* draw_frame(chip->gfx, _emu_renderer, _emu_texture); */
             }
 
