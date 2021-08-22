@@ -5,6 +5,8 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_error.h>
 #include <SDL2/SDL_events.h>
+#include <SDL2/SDL_log.h>
+#include <SDL2/SDL_pixels.h>
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_timer.h>
 #include <SDL2/SDL_video.h>
@@ -28,19 +30,38 @@ main(int argc, char* argv[])
 
     srand(time(NULL));
     bool is_runnning = true;
-    int delay = 16;
+    int delay = 150;
+
+    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+                     "Couldnt Initialize video, Reason: %s",
+                     SDL_GetError());
+        return 1;
+    }
 
     SDL_Window* _emu_win;
     SDL_Renderer* _emu_renderer;
 
-    create_window_and_renderer(&_emu_win, &_emu_renderer);
-
-    if (!_emu_win || !_emu_renderer) {
-        printf("Failed to init window|renderer %s", SDL_GetError());
+    if (SDL_CreateWindowAndRenderer(
+          64 * 10, 32 * 10, SDL_WINDOW_SHOWN, &_emu_win, &_emu_renderer)) {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR,
+                     "Couldnt Initialize Window and Renderer, Reason: %s",
+                     SDL_GetError());
         return 1;
     }
 
-    SDL_Texture* _emu_texture = create_texture(_emu_renderer);
+    /* create_window_and_renderer(&_emu_win, &_emu_renderer); */
+
+    /* if (!_emu_win || !_emu_renderer) { */
+    /*     printf("Failed to init window|renderer %s", SDL_GetError()); */
+    /*     return 1; */
+    /* } */
+
+    SDL_Texture* _emu_texture = SDL_CreateTexture(_emu_renderer,
+                                                  SDL_PIXELFORMAT_RGBA32,
+                                                  SDL_TEXTUREACCESS_STREAMING,
+                                                  64,
+                                                  32);
     if (!_emu_texture) {
         printf("Failed to create texture %s", SDL_GetError());
         return 2;
@@ -52,7 +73,7 @@ main(int argc, char* argv[])
         chip8* chip = initialize();
 
         // Load the game to play in memory
-        if (load("./ROMS/test_opcode.ch8") > 0) {
+        if (load("./ROMS/IBM.ch8") > 0) {
             printf("Failed to load ROM");
             return 1;
         }
@@ -61,9 +82,9 @@ main(int argc, char* argv[])
             // keep executing instructions until the draw flag is set and the
             // screen needs to be updated
             while (!chip->draw)
-                emulateCycle(chip, &is_runnning);
+                emulateCycle(chip);
 
-            /* input(chip, &is_runnning); */
+            input(chip, &is_runnning);
             // TODO store frame buffer on the chip, abstract the drawing of each
             // frame using renderer and textures
 

@@ -87,7 +87,7 @@ load(const char* gameLocation)
 }
 
 void
-decode_exec(uint16_t opcode, chip8* chip, bool* _is_running)
+decode_exec(uint16_t opcode, chip8* chip)
 {
     printf("%x -- %x -- %x\n", opcode, chip->PC, chip->SP);
     /* get_stk(); */
@@ -292,17 +292,17 @@ decode_exec(uint16_t opcode, chip8* chip, bool* _is_running)
         default:
             printf("Unkown opcode\n");
     }
-    input(chip, _is_running);
+    /* input(chip, _is_running); */
 }
 
 void
-emulateCycle(chip8* chip, bool* _is_running)
+emulateCycle(chip8* chip)
 {
     // fetch opcode
     uint16_t opcode = get_opcode(chip->PC);
 
     // decode opcode
-    decode_exec(opcode, chip, _is_running);
+    decode_exec(opcode, chip);
 
     // Update Timers
     if (chip->delay > 0)

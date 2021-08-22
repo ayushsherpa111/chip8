@@ -7,7 +7,7 @@
 #include <SDL2/SDL_video.h>
 #include <stdint.h>
 
-#define SCALE 2
+#define SCALE 10
 #define WIDTH 64
 #define HEIGHT 32
 
@@ -24,7 +24,8 @@ create_texture(SDL_Renderer* _renderer)
 void
 create_window_and_renderer(SDL_Window** _win, SDL_Renderer** _rend)
 {
-    if (SDL_CreateWindowAndRenderer(800, 600, SDL_WINDOW_SHOWN, _win, _rend))
+    if (SDL_CreateWindowAndRenderer(
+          SCALE * WIDTH, SCALE * HEIGHT, SDL_WINDOW_SHOWN, _win, _rend))
         SDL_LogError(SDL_LOG_CATEGORY_APPLICATION,
                      "Couldnt create window and renderer. Reason: %s",
                      SDL_GetError());

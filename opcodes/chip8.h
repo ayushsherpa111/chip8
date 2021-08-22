@@ -53,7 +53,7 @@ chip8*
 initialize();
 
 void
-emulateCycle(chip8*, bool*);
+emulateCycle(chip8*);
 
 int
 load(const char*);
