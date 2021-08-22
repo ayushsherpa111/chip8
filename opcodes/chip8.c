@@ -13,7 +13,7 @@
 void
 clear_disp(uint32_t* gfx)
 {
-    memset(gfx, INACTIVE_PX, X_SCREEN * Y_SCREEN);
+    memset(gfx, INACTIVE_PX, sizeof(uint32_t) * X_SCREEN * Y_SCREEN);
 }
 
 void
@@ -24,9 +24,9 @@ print_vm_state(chip8* vm)
 
 // clr_scr clears the screen by setting each pixel value to 0
 void
-init_scr(uint32_t* _scr)
+init_scr(uint32_t** _scr)
 {
-    _scr = malloc(sizeof(uint32_t) * X_SCREEN * Y_SCREEN);
+    *_scr = malloc(sizeof(uint32_t) * X_SCREEN * Y_SCREEN);
 }
 
 // NOTE does not handle warping coordinates
@@ -47,7 +47,7 @@ initialize()
     chip->wrapX = false;
     chip->wrapY = false;
     chip->keypad = 0;
-    init_scr(chip->gfx);
+    init_scr(&chip->gfx);
 
     init_mem();
 
@@ -61,8 +61,7 @@ reset(chip8* vm)
     clear_disp(vm->gfx);
     reset_stack();
     reset_reg();
-    vm->draw = false;
-    vm->I = vm->keypad = vm->SP = vm->delay = vm->sound = 0;
+    vm->draw = vm->I = vm->keypad = vm->SP = vm->delay = vm->sound = 0;
     vm->PC = 0x200;
 }
 
@@ -88,9 +87,10 @@ load(const char* gameLocation)
 }
 
 void
-decode_exec(uint16_t opcode, chip8* chip)
+decode_exec(uint16_t opcode, chip8* chip, bool* _is_running)
 {
-    uint16_t* _st_pop;
+    printf("%x -- %x -- %x\n", opcode, chip->PC, chip->SP);
+    /* get_stk(); */
     uint16_t result;
     uint8_t _op_X;
     uint8_t _op_Y;
@@ -111,10 +111,8 @@ decode_exec(uint16_t opcode, chip8* chip)
                     break;
                 case 0x000E: // return from subroutine
                     // Check if there is anything on the stack
-                    _st_pop = pop_stk(chip->SP);
-                    chip->PC = _st_pop[0];
-                    chip->SP = _st_pop[1];
-                    free(_st_pop);
+                    chip->PC = pop_stk(chip->SP);
+                    chip->SP--;
                     break;
             }
             break;
@@ -294,16 +292,17 @@ decode_exec(uint16_t opcode, chip8* chip)
         default:
             printf("Unkown opcode\n");
     }
+    input(chip, _is_running);
 }
 
 void
-emulateCycle(chip8* chip)
+emulateCycle(chip8* chip, bool* _is_running)
 {
     // fetch opcode
     uint16_t opcode = get_opcode(chip->PC);
 
     // decode opcode
-    decode_exec(opcode, chip);
+    decode_exec(opcode, chip, _is_running);
 
     // Update Timers
     if (chip->delay > 0)

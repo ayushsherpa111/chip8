@@ -13,14 +13,17 @@ get_opcode(uint16_t __opcode);
 uint16_t
 get_PC();
 
-void
-clear_disp();
+/* void */
+/* clear_disp(); */
 
 void
 load_rom(FILE* __rom_file);
 
 void
 disp_mem();
+
+void
+get_stk();
 
 uint16_t
 push_stk(uint16_t _sp, uint16_t _stk_val);
@@ -30,7 +33,7 @@ uint16_t sound_timer;
 
 // pop_stk
 // Pops data off the stack
-uint16_t*
+uint16_t
 pop_stk(uint16_t _sp);
 
 // reg_cmp_val

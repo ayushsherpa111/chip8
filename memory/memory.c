@@ -76,10 +76,8 @@ check_idx(uint8_t _idx, uint8_t limit)
 uint16_t
 push_stk(uint16_t _sp, uint16_t _stk_val)
 {
-    if (_sp < STACK_SIZE && _sp > 0) {
-        stack[_sp] = _stk_val;
-        _sp++;
-    }
+    stack[_sp] = _stk_val;
+    ++_sp;
     return _sp;
 }
 
@@ -88,15 +86,11 @@ push_stk(uint16_t _sp, uint16_t _stk_val)
 // Returns an array with 2 index.
 // 0 Value that was stored at the stack pointer
 // 1 New Stack pointer
-uint16_t*
+uint16_t
 pop_stk(uint16_t _sp)
 {
-    uint16_t* _stk_dat = calloc(2, sizeof(uint16_t));
-    if (_sp > 0) {
-        _stk_dat[0] = stack[_sp];
-        _stk_dat[1] = --_sp;
-    }
-    return _stk_dat;
+    --_sp;
+    return stack[_sp];
 }
 
 void
@@ -198,4 +192,14 @@ cleanup()
     free(memory);
     free(V);
     free(stack);
+}
+
+void
+get_stk()
+{
+    printf("--------------STACK--------------");
+    for (int i = 0; i < STACK_SIZE; i++) {
+        fprintf(stderr, "%d %x\n", i, stack[i]);
+    }
+    printf("---------------------------------");
 }

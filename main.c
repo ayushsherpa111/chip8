@@ -61,15 +61,18 @@ main(int argc, char* argv[])
             // keep executing instructions until the draw flag is set and the
             // screen needs to be updated
             while (!chip->draw)
-                emulateCycle(chip);
+                emulateCycle(chip, &is_runnning);
 
-            input(chip, &is_runnning);
+            /* input(chip, &is_runnning); */
             // TODO store frame buffer on the chip, abstract the drawing of each
             // frame using renderer and textures
 
             if (chip->draw) {
-                draw_frame(chip->gfx, _emu_renderer, _emu_texture);
-                chip->draw = false;
+                SDL_UpdateTexture(_emu_texture, NULL, chip->gfx, 64 * 4);
+                SDL_RenderCopy(_emu_renderer, _emu_texture, NULL, NULL);
+                SDL_RenderPresent(_emu_renderer);
+                /* draw_frame(chip->gfx, _emu_renderer, _emu_texture); */
+                chip->draw = 0;
             }
 
             SDL_Delay(delay);
