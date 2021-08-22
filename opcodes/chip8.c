@@ -47,11 +47,13 @@ initialize()
     chip->wrapX = false;
     chip->wrapY = false;
     chip->keypad = 0;
-    init_scr(&chip->gfx);
+    /* init_scr(&chip->gfx); */
+    chip->gfx = calloc(X_SCREEN * Y_SCREEN, sizeof(uint32_t));
+
+    memset(chip->gfx, ACTIVE_PX, sizeof(uint32_t) * X_SCREEN * Y_SCREEN);
 
     init_mem();
 
-    clear_disp(chip->gfx);
     return chip;
 }
 
@@ -103,7 +105,7 @@ decode_exec(uint16_t opcode, chip8* chip)
 
     switch (opcode & 0xF000) {
         case 0x0000:
-            switch (opcode & 0x000F) {
+            switch (opcode & 0x00FF) {
                 case 0x0000:
                     break;
                 case 0x00E0:
@@ -458,7 +460,7 @@ set_screen(chip8* vm, uint8_t _x_coord, uint8_t _y_coord, uint8_t height)
                     set_frame(
                       vm->gfx, _x_coord + col, _y_coord + row, ACTIVE_PX);
                 } else {
-                    set_reg(V_FLAG, 0x0);
+                    /* set_reg(V_FLAG, 0x0); */
                     set_frame(
                       vm->gfx, _x_coord + col, _y_coord + row, INACTIVE_PX);
                 }

@@ -30,7 +30,7 @@ main(int argc, char* argv[])
 
     srand(time(NULL));
     bool is_runnning = true;
-    int delay = 150;
+    int delay_SDL = 1500;
 
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         SDL_LogError(SDL_LOG_CATEGORY_ERROR,
@@ -78,6 +78,7 @@ main(int argc, char* argv[])
             return 1;
         }
         /* SDL_Event* usr_eve; */
+        int b = 4;
         while (is_runnning) {
             // keep executing instructions until the draw flag is set and the
             // screen needs to be updated
@@ -89,14 +90,17 @@ main(int argc, char* argv[])
             // frame using renderer and textures
 
             if (chip->draw) {
+                chip->draw = false;
+
+                SDL_LockTexture(_emu_texture, NULL, (void*)chip->gfx, &b);
                 SDL_UpdateTexture(_emu_texture, NULL, chip->gfx, 64 * 4);
+                SDL_UnlockTexture(_emu_texture);
                 SDL_RenderCopy(_emu_renderer, _emu_texture, NULL, NULL);
                 SDL_RenderPresent(_emu_renderer);
                 /* draw_frame(chip->gfx, _emu_renderer, _emu_texture); */
-                chip->draw = 0;
             }
 
-            SDL_Delay(delay);
+            SDL_Delay(delay_SDL);
         }
         free(chip);
     }

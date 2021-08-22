@@ -1,7 +1,7 @@
 C_SRC := $(shell find ./ -type f -name '*.c')
 CC := clang-9
 O_SRC = ${C_SRC:.c=.o}
-CFLAGS := `sdl2-config --libs --cflags ` -ggdb3 -O0 --std=c99 -Wall -lSDL2_image -lm
+CFLAGS := `sdl2-config --libs --cflags ` -ggdb3 -O0 --std=c99 -Wall -lm
 
 O_DIR := build
 REL_DIR = $(O_DIR)/release
