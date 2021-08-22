@@ -81,9 +81,10 @@ main(int argc, char* argv[])
         while (is_runnning) {
             // keep executing instructions until the draw flag is set and the
             // screen needs to be updated
-            while (!chip->draw)
+            while (!chip->draw){
+                SDL_PumpEvents();
                 emulateCycle(chip);
-            SDL_PumpEvents();
+            }
             input(chip, &is_runnning);
             // TODO store frame buffer on the chip, abstract the drawing of each
             // frame using renderer and textures
