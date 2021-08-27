@@ -111,10 +111,10 @@ decode_exec(uint16_t opcode, chip8* chip)
                 case 0x00E0:
                     clear_disp(chip->gfx);
                     break;
-                case 0x000E: // return from subroutine
+                case 0x00EE: // return from subroutine
                     // Check if there is anything on the stack
-                    chip->PC = pop_stk(chip->SP);
-                    chip->SP--;
+                    chip->PC = pop_stk(--chip->SP);
+                    /* chip->SP -= 1; */
                     break;
             }
             break;
@@ -319,6 +319,7 @@ input(chip8* vm, bool* is_running)
 {
     SDL_Event ev;
     while (SDL_PollEvent(&ev)) {
+        printf("EV TYPE: %x, KEY: %c\n", ev.type, ev.key.keysym.sym);
         switch (ev.type) {
             case SDL_QUIT:
                 *is_running = false;
@@ -373,8 +374,12 @@ input(chip8* vm, bool* is_running)
                     case SDLK_v:
                         vm->keypad |= KEY_F;
                         break;
+                    case SDLK_p:
+                        *(is_running) = false;
+                        break;
                     // TODO add a clear screen/reset button
                     case SDLK_o:
+                        reset(vm);
                         break;
                     default:
                         break;
@@ -461,13 +466,12 @@ set_screen(chip8* vm, uint8_t _x_coord, uint8_t _y_coord, uint8_t height)
                     set_frame(
                       vm->gfx, _x_coord + col, _y_coord + row, INACTIVE_PX);
                 } else {
-                    /* set_reg(V_FLAG, 0x0); */
                     set_frame(
                       vm->gfx, _x_coord + col, _y_coord + row, ACTIVE_PX);
                 }
-                // set draw flag
             }
         }
     }
+    // set draw flag
     vm->draw = true;
 }

@@ -11,6 +11,7 @@
 #define STACK_SIZE 16
 
 #define OFFSET 0x200
+#define MAX_GAME_SIZE (0x1000 - 0x200)
 
 uint16_t delay;
 uint16_t sound_timer;
@@ -92,7 +93,6 @@ push_stk(uint16_t _sp, uint16_t _stk_val)
 uint16_t
 pop_stk(uint16_t _sp)
 {
-    --_sp;
     return stack[_sp];
 }
 
@@ -105,14 +105,7 @@ load_fontset(uint8_t* font_set)
 void
 load_rom(FILE* rom_file)
 {
-    int num_bytes;
-
-    fseek(rom_file, 0L, SEEK_END);
-    num_bytes = ftell(rom_file);
-
-    fseek(rom_file, 0L, SEEK_SET);
-
-    fread(memory + OFFSET, sizeof(memory), num_bytes, rom_file);
+    fread(memory + OFFSET, 1, MAX_GAME_SIZE, rom_file);
 }
 
 void
