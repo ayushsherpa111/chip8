@@ -164,7 +164,7 @@ decode_exec(uint16_t opcode, chip8* chip)
             switch (opcode & 0x000F) {
                 case 0x0000:
                     // set Vx = Vy
-                    result = _op_X;
+                    result = _op_Y;
                     break;
                 case 0x0001:
                     result = _op_X | _op_Y;
@@ -275,8 +275,8 @@ decode_exec(uint16_t opcode, chip8* chip)
                     break;
                 case 0x0033:
                     bcd = _V((opcode & 0x0F00) >> 8);
-                    set_mem(chip->I, bcd / 100);
-                    set_mem((chip->I) + 1, (bcd / 10) % 10);
+                    set_mem(chip->I, (bcd % 1000) / 100);
+                    set_mem((chip->I) + 1, (bcd % 100) / 10);
                     set_mem((chip->I) + 2, bcd % 10);
                     break;
                 case 0x0055:
@@ -294,7 +294,6 @@ decode_exec(uint16_t opcode, chip8* chip)
         default:
             printf("Unkown opcode\n");
     }
-    /* input(chip, _is_running); */
 }
 
 void
