@@ -129,9 +129,7 @@ decode_exec(uint16_t opcode, chip8* chip)
             break;
         case 0x3000:
             // Skip next instruction if NN == V[X]
-            chip->PC +=
-              reg_cmp_val((opcode & 0x0F00) >> 8, opcode & 0x00FF, &_equ) ? 2
-                                                                          : 0;
+            chip->PC += _V((opcode & 0x0F00) >> 8) == (opcode & 0x00FF) ? 2 : 0;
             break;
         case 0x4000:
             // Skip next instruction if NN != V[X]
@@ -158,46 +156,47 @@ decode_exec(uint16_t opcode, chip8* chip)
             _V((opcode & 0x0F00) >> 8) < (opcode & 0x00FF) ? set_reg(V_FLAG, 1)
                                                            : set_reg(V_FLAG, 0);
             break;
-        case 0x8000:
-            _op_X = _V((opcode & 0x0F00) >> 8);
+        case 0x8000:{
+            int _X = (opcode & 0x0F00) >> 8;
+            _op_X = _V(_X);
             _op_Y = _V((opcode & 0x00F0) >> 4);
             switch (opcode & 0x000F) {
                 case 0x0000:
                     // set Vx = Vy
-                    result = _op_X;
+                    set_reg(_X, _op_Y);
                     break;
                 case 0x0001:
-                    result = _op_X | _op_Y;
+                    set_reg(_X, _op_X | _op_Y);
                     break;
                 case 0x0002:
-                    result = _op_X & _op_Y;
+                    set_reg(_X, _op_X & _op_Y);
                     break;
                 case 0x0003:
-                    result = _op_X ^ _op_Y;
+                    set_reg(_X, _op_X ^ _op_Y);
                     break;
                 case 0x0004:
-                    result = _op_X + _op_Y;
+                    set_reg(_X, _op_X + _op_Y);
                     set_reg(V_FLAG, result < _op_X ? 0x1 : 0x0);
                     break;
                 case 0x0005:
-                    result = _op_X - _op_Y;
+                    set_reg(_X, _op_X - _op_Y);
                     set_reg(V_FLAG, result > _op_X ? 0x1 : 0x0);
                     break;
                 case 0x0006:
                     set_reg(V_FLAG, _op_X & 0x0001);
-                    result = _op_X >> 1;
+                    set_reg(_X, _op_X >> 1);
                     break;
                 case 0x0007:
-                    result = _op_Y - _op_X;
+                    set_reg(_X, _op_Y - _op_X);
                     set_reg(V_FLAG, result > _op_Y ? 0x1 : 0x0);
                     break;
                 case 0x000E:
                     set_reg(V_FLAG, _op_X & 0x80);
-                    result = _op_X << 1;
+                    set_reg(_X, _op_X << 1);
                     break;
             }
-            set_reg((opcode & 0x0F00) >> 8, result);
             break;
+        }
         case 0x9000:
             chip->PC += !reg_cmp_reg(
                           (opcode & 0x0F00) >> 8, (opcode & 0x00F0) >> 4, &_equ)
@@ -276,19 +275,21 @@ decode_exec(uint16_t opcode, chip8* chip)
                 case 0x0033:
                     bcd = _V((opcode & 0x0F00) >> 8);
                     set_mem(chip->I, bcd / 100);
-                    set_mem((chip->I) + 1, (bcd / 10) % 10);
-                    set_mem((chip->I) + 2, bcd % 10);
+                    set_mem(chip->I + 1, (bcd / 10) % 10);
+                    set_mem(chip->I + 2, bcd % 10);
                     break;
-                case 0x0055:
+                case 0x0055:{
                     for (int i = 0; i <= ((opcode & 0x0F00) >> 8); i++) {
                         set_mem((chip->I) + i, _V(i));
                     }
                     break;
-                case 0x0056:
+                }
+                case 0x0065:{
                     for (int i = 0; i <= ((opcode & 0x0F00) >> 8); i++) {
-                        set_reg(_V(i), read_mem((chip->I) + i));
+                        set_reg(i, read_mem(chip->I + i));
                     }
                     break;
+                }
             }
             break;
         default:

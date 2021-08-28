@@ -69,7 +69,7 @@ main(int argc, char* argv[])
         chip8* chip = initialize();
 
         // Load the game to play in memory
-        if (load("./ROMS/Airplane.ch8") > 0) {
+        if (load("ROMS/test_opcode.ch8") > 0) {
             printf("Failed to load ROM");
             return 1;
         }
